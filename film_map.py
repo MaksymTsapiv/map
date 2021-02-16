@@ -19,9 +19,10 @@ def sort_data(data, year, place):
     """
     """
     sorted_list = []
+    name_dict = {"United States": "USA"}
     for tpl in data:
         try:
-            if int(tpl[0][tpl[0].find('(')+1:tpl[0].find(')')]) == year and tpl[1].find(place) != -1:
+            if int(tpl[0][tpl[0].find('(')+1:tpl[0].find(')')]) == year and tpl[1].find(name_dict.get(place, place)) != -1:
                 sorted_list.append(tpl)
         except ValueError:
             continue
@@ -32,9 +33,9 @@ def sort_data(data, year, place):
 def input_location():
     """
     """
-    lat = input("Enter the latitude: ")
-    long = input("Enter the longitude: ")
-    year = input("Enter the year: ")
+    lat = int(input("Enter the latitude: "))
+    long = int(input("Enter the longitude: "))
+    year = int(input("Enter the year: "))
     return lat, long, year
 
 
@@ -42,14 +43,9 @@ def input_location():
 def map_generator(lat, long, data_list):
     """
     """
-    map = folium.Map(location=[lat, long], zoom_start=10, tiles="Stamen Terrain")
-    data = pd.DataFrame({
-        'lat': [int(i[1][0]) for i in data_list],
-        'long': [int(i[1][1]) for i in data_list],
-        'name': [i[0][0] for i in data_list]
-    })
-    for i in range(0, len(data)):
-        folium.Marker([data.iloc[i]['long'], data.iloc[i]['lat']], popup=data.iloc[i]['name']).add_to(map)
+    map = folium.Map(location=[lat, long], zoom_start=6, tiles="Stamen Terrain")
+    for name, coord, _ in data_list:
+        folium.Marker([coord[0], coord[1]], popup=name).add_to(map)
     map.save('Film_Map.html')
     return map
 
@@ -87,7 +83,8 @@ def find_distance(lat, long, city):
 def main():
     lat, long, year = input_location()
     factor = my_location(lat, long).split(', ')[-1]
-    data = sort_data(read_file(os.path.join(os.getcwd(), 'locations.csv')), year, factor)
+    path = os.path.join(os.getcwd(), 'locations.csv')
+    data = sort_data(read_file(path), year, factor)
     map_generator(lat, long, closest_to_me(lat, long, data))
 
 

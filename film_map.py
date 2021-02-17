@@ -93,7 +93,7 @@ def main():
     """
     lat, long, year = input_location()
     factor = my_location(lat, long).split(', ')[-1]
-    path = os.path.join(os.getcwd(),'Task-2', 'locations.csv')
+    path = os.path.join(os.getcwd(), 'locations.csv')
     data = sort_data(read_file(path), year, factor)
     map_generator(lat, long, closest_to_me(lat, long, data))
 

@@ -50,6 +50,13 @@ def map_generator(lat, long, data_list):
     map = folium.Map(location=[lat, long], zoom_start=6, tiles="Stamen Terrain")
     for name, coord, _ in data_list:
         folium.Marker([coord[0], coord[1]], popup=name).add_to(map)
+        folium.Circle(
+            radius=30000,
+            location=(coord[0], coord[1]),
+            popup=name,
+            color="crimson",
+            fill=False,
+        ).add_to(map)
     map.save('Film_Map.html')
     return map
 

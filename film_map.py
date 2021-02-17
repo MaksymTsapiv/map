@@ -1,13 +1,14 @@
-import pandas as pd
+"""Film map"""
+
 import os
-import geopy
 import folium
 from geopy.geocoders import Nominatim
-from geopy.distance import geodesic, distance
+from geopy.distance import distance
 from geopy.extra.rate_limiter import RateLimiter
 
 def read_file(path):
     """
+    Reads file
     """
     y = lambda x: (x[0], x[-1])
     with open(path, 'r', encoding='utf-8', errors='ignore') as file:
@@ -17,6 +18,7 @@ def read_file(path):
 
 def sort_data(data, year, place):
     """
+    Sorts the data
     """
     sorted_list = []
     name_dict = {"United States": "USA"}
@@ -32,6 +34,7 @@ def sort_data(data, year, place):
 
 def input_location():
     """
+    Inputs location
     """
     lat = int(input("Enter the latitude: "))
     long = int(input("Enter the longitude: "))
@@ -42,6 +45,7 @@ def input_location():
 
 def map_generator(lat, long, data_list):
     """
+    Generates html file with the map
     """
     map = folium.Map(location=[lat, long], zoom_start=6, tiles="Stamen Terrain")
     for name, coord, _ in data_list:
@@ -52,14 +56,15 @@ def map_generator(lat, long, data_list):
 
 def closest_to_me(lat, long, data):
     """
+    Finds 10 closest film shooting location
     """
-
     return list(sorted(map(lambda x: [*x, find_distance(lat, long, x[1])], map(lambda x: [x[0], location_films(x[1])], data)), key=lambda x: x[-1]))[:10]
 
 
 
 def my_location(lat, long):
     """
+    Finds location address
     """
     geolocator = Nominatim(user_agent="film_map")
     location = geolocator.reverse(f"{lat}, {long}", language="en")
@@ -68,6 +73,7 @@ def my_location(lat, long):
 
 def location_films(place):
     """
+    Finds location of films shooting places
     """
     geolocator = Nominatim(user_agent="film_map")
     geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
@@ -77,13 +83,17 @@ def location_films(place):
 
 def find_distance(lat, long, city):
     """
+    Finds distance between two points
     """
     return distance((lat, long), city).km
 
 def main():
+    """
+    Main function
+    """
     lat, long, year = input_location()
     factor = my_location(lat, long).split(', ')[-1]
-    path = os.path.join(os.getcwd(), 'locations.csv')
+    path = os.path.join(os.getcwd(),'Task-2', 'locations.csv')
     data = sort_data(read_file(path), year, factor)
     map_generator(lat, long, closest_to_me(lat, long, data))
 
